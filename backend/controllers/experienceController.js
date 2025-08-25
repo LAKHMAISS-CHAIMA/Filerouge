@@ -46,8 +46,10 @@ export const getAllExperiences = async (req, res) => {
 
 export const getExperienceById = async (req, res) => {
   try {
-    const experience = await Experience.findById(req.params.id);
-    if (!experience) return res.status(404).json({ message: "Expérience non trouvée." });
+    const experience = await Experience.findById(req.params.id).populate("user", "firstname lastname");
+    if (!experience) {
+      return res.status(404).json({ message: "Expérience non trouvée." });
+    }
     res.json(experience);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur." });
@@ -55,9 +57,48 @@ export const getExperienceById = async (req, res) => {
 };
 
 export const updateExperience = async (req, res) => {
-  res.status(501).json({ message: "Non implémenté." });
+  try {
+    const experience = await Experience.findById(req.params.id);
+
+    if (!experience) {
+      return res.status(404).json({ message: "Expérience non trouvée." });
+    }
+
+    if (experience.user.toString() !== req.user._id.toString() && req.user.role !== "Admin") {
+      return res.status(403).json({ message: "Accès refusé: vous ne pouvez pas modifier cette expérience." });
+    }
+
+    const { title, description, substances, result } = req.body;
+
+    experience.title = title || experience.title;
+    experience.description = description || experience.description;
+    experience.substances = substances || experience.substances;
+    experience.result = result || experience.result;
+
+    const updated = await experience.save();
+    res.json({ message: "Expérience mise à jour", experience: updated });
+
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la mise à jour." });
+  }
 };
 
 export const deleteExperience = async (req, res) => {
-  res.status(501).json({ message: "Non implémenté." });
+  try {
+    const experience = await Experience.findById(req.params.id);
+
+    if (!experience) {
+      return res.status(404).json({ message: "Expérience non trouvée." });
+    }
+
+    if (experience.user.toString() !== req.user._id.toString() && req.user.role !== "Admin") {
+      return res.status(403).json({ message: "Accès refusé: vous ne pouvez pas supprimer cette expérience." });
+    }
+
+    await experience.deleteOne();
+
+    res.json({ message: "Expérience supprimée avec succès" });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la suppression." });
+  }
 }; 

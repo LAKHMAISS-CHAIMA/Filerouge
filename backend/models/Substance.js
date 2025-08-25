@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
 
-const substanceSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  formula: { type: String },
-  description: { type: String },
-  createdAt: { type: Date, default: Date.now }
+const SubstanceSchema = new mongoose.Schema({
+  nom: String,
+  formule: String,
+  description: String,
+  imageUrl: String,
 });
 
-const Substance = mongoose.model("Substance", substanceSchema);
-
+const Substance = mongoose.model("Substance", SubstanceSchema);
 export default Substance;

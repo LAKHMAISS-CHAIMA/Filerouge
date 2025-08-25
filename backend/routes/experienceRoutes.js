@@ -4,7 +4,10 @@ import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
 import { 
   createExperience, 
   getUserHistory, 
-  getAllExperiences 
+  getAllExperiences,
+  getExperienceById,
+  updateExperience,
+  deleteExperience
 } from "../controllers/experienceController.js";
 import { addExperienceToFavorites } from "../controllers/favorisController.js";
 
@@ -22,5 +25,11 @@ router.get("/historique", protect, getUserHistory);
 router.post("/:id/favoris", protect, addExperienceToFavorites);
 
 router.get("/all", protect, authorizeRoles("Admin"), getAllExperiences);
+
+router.get("/:id", protect, getExperienceById);
+
+router.put("/:id", protect, updateExperience);
+
+router.delete("/:id", protect, deleteExperience);
 
 export default router;
