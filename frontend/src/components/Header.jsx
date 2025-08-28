@@ -23,12 +23,55 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
-                <div className="hidden md:flex items-center space-x-2">
+                <nav className="hidden md:flex items-center space-x-4">
+                  <Link
+                    to="/dashboard"
+                    className="text-blue-100 hover:text-white px-3 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                  >
+                    📊 Dashboard
+                  </Link>
+                  <Link
+                    to="/simulate"
+                    className="text-blue-100 hover:text-white px-3 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                  >
+                    🧪 Simuler
+                  </Link>
+                  <Link
+                    to="/substance-library"
+                    className="text-blue-100 hover:text-white px-3 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                  >
+                    📚 Bibliothèque
+                  </Link>
+                  <Link
+                    to="/experience-history"
+                    className="text-blue-100 hover:text-white px-3 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                  >
+                    📋 Historique
+                  </Link>
+                  
+                  {user.role === "Admin" && (
+                    <Link
+                      to="/admin"
+                      className="text-yellow-200 hover:text-yellow-100 px-3 py-2 rounded-lg hover:bg-yellow-600 transition-colors font-medium"
+                    >
+                      🛡️ Admin
+                    </Link>
+                  )}
+                </nav>
+
+                <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-sm font-semibold">{user.name?.charAt(0).toUpperCase()}</span>
                   </div>
-                  <span className="text-sm">Bonjour, {user.name}</span>
+                  <div className="hidden md:block">
+                    <div className="text-sm font-medium">{user.name}</div>
+                    <div className="text-xs text-blue-200">
+                      {user.role === "Admin" ? "👑 Administrateur" : 
+                       user.role === "Professeur" ? "👨‍🏫 Professeur" : "👨‍🎓 Étudiant"}
+                    </div>
+                  </div>
                 </div>
+
                 <button 
                   onClick={logout} 
                   className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors font-medium"

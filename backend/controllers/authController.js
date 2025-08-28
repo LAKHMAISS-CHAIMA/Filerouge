@@ -13,18 +13,31 @@ export const register = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { firstname, lastname, email, password } = req.body;
+  const { firstname, lastname, email, password, role } = req.body;
   try {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "Cet utilisateur existe déjà" });
     }
-    const user = await User.create({ firstname, lastname, email, password });
+    const user = await User.create({ 
+      firstname, 
+      lastname, 
+      email, 
+      password,
+      role: role || "Étudiant"
+    });
     res.status(201).json({
-      _id: user._id,
+      success: true,
+      user: {
+        id: user._id,
+        name: `${user.firstname} ${user.lastname}`,
+        email: user.email,
+        role: user.role
+      },
       token: generateToken(user._id),
     });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
@@ -39,13 +52,20 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
       res.json({
-        _id: user._id,
+        success: true,
+        user: {
+          id: user._id,
+          name: `${user.firstname} ${user.lastname}`,
+          email: user.email,
+          role: user.role
+        },
         token: generateToken(user._id),
       });
     } else {
       res.status(401).json({ message: "Email ou mot de passe incorrect" });
     }
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
@@ -53,8 +73,17 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
-    res.json(user);
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: `${user.firstname} ${user.lastname}`,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
+    console.error('Get user error:', error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };

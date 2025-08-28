@@ -9,7 +9,8 @@ const registerValidation = [
   body("firstname").notEmpty().withMessage("Le prénom est requis."),
   body("lastname").notEmpty().withMessage("Le nom est requis."),
   body("email").isEmail().withMessage("Email invalide."),
-  body("password").isLength({ min: 8 }).withMessage("Le mot de passe doit contenir au moins 8 caractères."),
+  body("password").isLength({ min: 6 }).withMessage("Le mot de passe doit contenir au moins 6 caractères."),
+  body("role").optional().isIn(["Étudiant", "Professeur", "Admin"]).withMessage("Rôle invalide."),
 ];
 
 const loginValidation = [

@@ -42,7 +42,6 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header avec profil et logout */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -50,20 +49,37 @@ const UserDashboard = () => {
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-blue-900">👋 Bienvenue, {user?.name || "Utilisateur"}</h1>
+                <h1 className="text-2xl font-bold text-blue-900">
+                  👋 Bienvenue, {user?.name || "Utilisateur"}
+                </h1>
                 <p className="text-gray-600">{user?.email || "user@example.com"}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className="text-sm px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                    {user?.role === "Admin" ? "👑 Administrateur" : 
+                     user?.role === "Professeur" ? "👨‍🏫 Professeur" : "👨‍🎓 Étudiant"}
+                  </span>
+                </div>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              🚪 Déconnexion
-            </button>
+            <div className="flex items-center space-x-3">
+              {user?.role === "Admin" && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  🛡️ Panel Admin
+                </button>
+              )}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                🚪 Déconnexion
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Statistiques simples */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white rounded-xl shadow-lg p-6 text-center">
             <div className="text-3xl font-bold text-blue-600 mb-2">{simpleStats.experiments}</div>
@@ -79,7 +95,6 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        {/* Favoris simples */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h2 className="text-xl font-bold text-blue-900 mb-4">❤️ Mes Favoris</h2>
           <div className="space-y-3">
@@ -103,7 +118,7 @@ const UserDashboard = () => {
         {/* Actions rapides */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-xl font-bold text-blue-900 mb-4">🚀 Actions Rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <button
               onClick={() => navigate("/create-experience")}
               className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center"
@@ -125,6 +140,28 @@ const UserDashboard = () => {
               <div className="text-2xl mb-2">📋</div>
               <div>Historique</div>
             </button>
+            
+            {/* Admin Only Actions */}
+            {user?.role === "Admin" && (
+              <button
+                onClick={() => navigate("/admin")}
+                className="p-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-center"
+              >
+                <div className="text-2xl mb-2">🛡️</div>
+                <div>Administration</div>
+              </button>
+            )}
+            
+            {/* Professor Only Actions */}
+            {(user?.role === "Professeur" || user?.role === "Admin") && (
+              <button
+                onClick={() => toast.info("Fonctionnalité à venir")}
+                className="p-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center"
+              >
+                <div className="text-2xl mb-2">👨‍🏫</div>
+                <div>Gérer Classes</div>
+              </button>
+            )}
           </div>
         </div>
       </div>

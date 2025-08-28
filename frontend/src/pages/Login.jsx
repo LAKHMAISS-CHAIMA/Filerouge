@@ -9,19 +9,55 @@ const Login = () => {
     password: "",
   })
   const [loading, setLoading] = useState(false)
+  const [formErrors, setFormErrors] = useState({})
   const { login } = useAuth()
   const navigate = useNavigate()
 
+  const validateForm = () => {
+    const errors = {}
+    
+    if (!formData.email.trim()) {
+      errors.email = "L'email est requis"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Format d'email invalide"
+    }
+
+    if (!formData.password) {
+      errors.password = "Le mot de passe est requis"
+    } else if (formData.password.length < 6) {
+      errors.password = "Le mot de passe doit contenir au moins 6 caractères"
+    }
+
+    return errors
+  }
+
   const handleChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     })
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const errors = validateForm()
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
+      return
+    }
+
     setLoading(true)
+    setFormErrors({})
 
     try {
       const result = await login(formData.email, formData.password)
@@ -29,107 +65,103 @@ const Login = () => {
         navigate("/dashboard")
       }
     } catch (error) {
-      toast.error("Erreur de connexion")
+      toast.error("Email ou mot de passe incorrect")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-violet-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-emerald-100">
-            <svg className="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z"
-              />
-            </svg>
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-blue-100 mb-4">
+              <span className="text-2xl">🧪</span>
+            </div>
+            <h2 className="text-3xl font-bold text-blue-900 mb-2">ChemLab Sim</h2>
+            <p className="text-gray-600">Connectez-vous à votre compte</p>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Connexion à ChemLab Sim</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Ou{" "}
-            <Link to="/register" className="font-medium text-emerald-600 hover:text-emerald-500">
-              créez un nouveau compte
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="sr-only">
-                Adresse email
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email *
               </label>
               <input
-                id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
-                placeholder="Adresse email"
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  formErrors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="votre@email.com"
               />
+              {formErrors.email && (
+                <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+              )}
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
-                Mot de passe
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mot de passe *
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
-                placeholder="Mot de passe"
+                name="password"
                 value={formData.password}
                 onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  formErrors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Votre mot de passe"
               />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Se souvenir de moi
-              </label>
+              {formErrors.password && (
+                <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
+              )}
             </div>
 
-            <div className="text-sm">
-              <a href="#" className="font-medium text-emerald-600 hover:text-emerald-500">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
+                  Se souvenir de moi
+                </label>
+              </div>
+              <Link to="#" className="text-sm text-blue-600 hover:text-blue-800">
                 Mot de passe oublié ?
-              </a>
+              </Link>
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {loading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Connexion...
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Connexion en cours...
                 </div>
               ) : (
-                "Se connecter"
+                "🔑 Se connecter"
               )}
             </button>
-          </div>
-        </form>
+
+            <div className="text-center">
+              <p className="text-gray-600">
+                Pas encore de compte ?{" "}
+                <Link to="/register" className="text-blue-600 hover:text-blue-800 font-medium">
+                  Créer un compte
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

@@ -1,10 +1,11 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "./context/AuthContext"
 import Header from "./components/Header"
-import Navbar from "./components/NavBar"
 import Footer from "./components/Footer"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AdminProtectedRoute from "./components/AdminProtectedRoute"
+import RoleProtectedRoute from "./components/RoleProtectedRoute"
+import UnauthorizedPage from "./components/UnauthorizedPage"
 import Spinner from "./components/Spinner"
 
 import Home from "./pages/Home"
@@ -20,6 +21,11 @@ import Favorites from "./pages/Favorites"
 import ResultsDisplay from "./pages/ResultsDisplay"
 
 function App() {
+  const { loading } = useAuth()
+
+  if (loading) {
+    return <Spinner />
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -30,6 +36,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           <Route
             path="/simulate"
@@ -97,11 +104,13 @@ function App() {
           <Route
             path="/admin"
             element={
-              <AdminProtectedRoute>
+              <RoleProtectedRoute allowedRoles={["Admin"]} showUnauthorized={true}>
                 <Admin />
-              </AdminProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 

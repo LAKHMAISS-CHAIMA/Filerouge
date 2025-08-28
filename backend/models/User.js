@@ -18,9 +18,9 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String, required: [true, "Le mot de passe est requis"],
-        minlength: [8, "Le mot de passe doit contenir au moins 6 caractères"],
+        minlength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
     },
-    role: { type: String, enum: ["Étudiant", "Enseignant", "Admin"], default: "Étudiant" },
+    role: { type: String, enum: ["Étudiant", "Professeur", "Admin"], default: "Étudiant" },
     favoris: [{ type: mongoose.Schema.Types.ObjectId, ref: "Experience" }]
 },
     { timestamps: true });
